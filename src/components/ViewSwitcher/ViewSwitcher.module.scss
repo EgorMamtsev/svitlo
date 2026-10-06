@@ -1,0 +1,68 @@
+// src/components/ViewSwitcher/ViewSwitcher.module.scss
+@import "../../styles/mixins";
+
+.viewSwitcher {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewSwitcher__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #313237;
+}
+
+.viewSwitcher__buttons {
+  display: flex;
+  gap: 8px;
+  background-color: #f5f6f7;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.viewSwitcher__button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #89939a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #313237;
+  }
+
+  &_active {
+    background-color: #fff;
+    color: #313237;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.icon {
+  font-size: 16px;
+}
+
+/* --- Мобільний (< 640px) --- */
+@include mobile-only {
+  .viewSwitcher {
+    width: 100%;
+  }
+
+  .viewSwitcher__buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .viewSwitcher__button {
+    flex: 1;
+    justify-content: center;
+  }
+}

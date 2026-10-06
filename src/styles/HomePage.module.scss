@@ -1,0 +1,64 @@
+// src/styles/HomePage.module.scss
+@import "./mixins";
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.home__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.home__controls {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.home__schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Планшет (640px — 1199px) --- */
+@include tablet-only {
+  .home {
+    gap: 20px;
+  }
+
+  .home__top {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .home__controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* --- Мобільний (< 640px) --- */
+@include mobile-only {
+  .home {
+    gap: 16px;
+  }
+
+  .home__top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .home__controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+}

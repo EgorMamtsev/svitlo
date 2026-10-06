@@ -1,0 +1,50 @@
+// src/components/ThemeSwitcher/ThemeSwitcher.module.scss
+@import "../../styles/mixins";
+
+.themeSwitcher {
+  display: flex;
+  align-items: center;
+}
+
+.themeSwitcher__buttons {
+  display: flex;
+  gap: 4px;
+  background-color: #f5f6f7;
+  padding: 3px;
+  border-radius: 20px;
+  border: 1px solid #e2e6e9;
+}
+
+.themeSwitcher__button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &_active {
+    background-color: #476df4;
+    box-shadow: 0 2px 4px rgba(71, 109, 244, 0.3);
+  }
+}
+
+.icon {
+  font-size: 12px;
+}
+
+/* --- Мобільний (< 640px) --- */
+@include mobile-only {
+  .themeSwitcher__button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .icon {
+    font-size: 10px;
+  }
+}

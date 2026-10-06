@@ -1,0 +1,183 @@
+// src/components/ScheduleChart/ScheduleChart.module.scss
+@import "../../styles/mixins";
+
+.chart {
+  background: #fff;
+  border: 1px solid #e2e6e9;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.chart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart__dateWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart__date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #313237;
+}
+
+.chart__icon {
+  font-size: 18px;
+}
+
+.chart__updated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #89939a;
+  margin-left: 26px;
+}
+
+.chart__updatedDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #4caf50;
+}
+
+.chart__nav {
+  display: flex;
+  gap: 8px;
+}
+
+.chart__navButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e2e6e9;
+  background: #fff;
+  color: #313237;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f5f6f7;
+  }
+}
+
+.chart__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 700px; /* Мінімальна ширина, щоб не стискалося */
+}
+
+.chart__timeScale {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  margin-left: 100px;
+  margin-bottom: 8px;
+}
+
+.chart__timeLabel {
+  font-size: 11px;
+  color: #89939a;
+  text-align: center;
+}
+
+.chart__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.chart__queueName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 84px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #313237;
+  flex-shrink: 0;
+}
+
+.chart__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #e2e6e9;
+
+  &_active {
+    background-color: #476df4;
+  }
+}
+
+.chart__cells {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+  flex: 1;
+}
+
+.chart__cell {
+  height: 16px;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &_green {
+    background-color: #a8e6a3;
+  }
+
+  &_red {
+    background-color: #f4a2a2;
+  }
+}
+
+/* --- Мобільний (< 640px) --- */
+@include mobile-only {
+  .chart {
+    padding: 16px;
+  }
+
+  .chart__date {
+    font-size: 14px;
+  }
+
+  .chart__updated {
+    font-size: 10px;
+    margin-left: 22px;
+  }
+
+  .chart__navButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .chart__grid {
+    min-width: 600px;
+  }
+
+  .chart__queueName {
+    width: 70px;
+    font-size: 12px;
+  }
+
+  .chart__cell {
+    height: 14px;
+  }
+}
