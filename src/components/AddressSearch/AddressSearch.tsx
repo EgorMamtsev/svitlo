@@ -1,13 +1,17 @@
 // src/components/AddressSearch/AddressSearch.tsx
 import { useState, useEffect, useRef } from "react";
 import styles from "./AddressSearch.module.scss";
-import { fetchStreets, fetchHouses, fetchGroup } from "../../api/yasno/yasnoAddressApi";
+import {
+  fetchStreets,
+  fetchHouses,
+  fetchGroup,
+} from "../../api/yasno/yasnoAddressApi";
 import type { Street, House } from "../../api/yasno/yasnoAddressApi";
 
 interface AddressSearchProps {
   regionId: number;
   dsoId: number;
-  onGroupFound: (group: string) => void;
+  onGroupFound: (group: string, addressLabel: string) => void;
 }
 
 const STORAGE_KEYS = {
@@ -16,7 +20,11 @@ const STORAGE_KEYS = {
   group: "powergrid_address_group",
 };
 
-export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchProps) => {
+export const AddressSearch = ({
+  regionId,
+  dsoId,
+  onGroupFound,
+}: AddressSearchProps) => {
   const [streetQuery, setStreetQuery] = useState("");
   const [houseQuery, setHouseQuery] = useState("");
   const [streets, setStreets] = useState<Street[]>([]);
@@ -31,13 +39,18 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
   const streetRef = useRef<HTMLDivElement>(null);
   const houseRef = useRef<HTMLDivElement>(null);
 
-  // Закриваємо dropdown при кліку поза ним
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (streetRef.current && !streetRef.current.contains(event.target as Node)) {
+      if (
+        streetRef.current &&
+        !streetRef.current.contains(event.target as Node)
+      ) {
         setIsStreetOpen(false);
       }
-      if (houseRef.current && !houseRef.current.contains(event.target as Node)) {
+      if (
+        houseRef.current &&
+        !houseRef.current.contains(event.target as Node)
+      ) {
         setIsHouseOpen(false);
       }
     };
@@ -45,7 +58,6 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Завантажуємо збережену адресу при монтуванні
   useEffect(() => {
     const savedStreet = localStorage.getItem(STORAGE_KEYS.street);
     const savedHouse = localStorage.getItem(STORAGE_KEYS.house);
@@ -58,7 +70,7 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
       setSelectedHouse(house);
       setStreetQuery(street.value);
       setHouseQuery(house.value);
-      onGroupFound(savedGroup);
+      onGroupFound(savedGroup, `${street.value}, ${house.value}`);
     }
   }, []);
 
@@ -81,11 +93,41 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
     return () => clearTimeout(timer);
   }, [streetQuery, regionId, dsoId, selectedStreet]);
 
-  // При кліку на поле будинку — завантажуємо ВСІ будинки (порожній query)
+  // Живий пошук будинків (debounce 300ms)
+  useEffect(() => {
+    if (!selectedStreet || houseQuery.length < 1 || selectedHouse) {
+      setHouses([]);
+      return;
+    }
+
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      fetchHouses(regionId, dsoId, selectedStreet.id, houseQuery).then(
+        (result) => {
+          setHouses(result);
+          setIsHouseOpen(true);
+          setIsLoading(false);
+        },
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [houseQuery, selectedStreet, regionId, dsoId, selectedHouse]);
+
+  const handleStreetSelect = (street: Street) => {
+    setSelectedStreet(street);
+    setStreetQuery(street.value);
+    setIsStreetOpen(false);
+    setHouseQuery("");
+    setSelectedHouse(null);
+    setHouses([]);
+    setError(null);
+  };
+
+  // При кліку на поле будинку — завантажуємо ВСІ будинки
   const handleHouseFocus = async () => {
     if (!selectedStreet) return;
     if (houses.length > 0) {
-      // Якщо вже завантажені — просто відкриваємо
       setIsHouseOpen(true);
       return;
     }
@@ -103,35 +145,6 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
     }
   };
 
-  // Живий пошук будинків, коли користувач вводить цифру (debounce 300ms)
-  useEffect(() => {
-    if (!selectedStreet || houseQuery.length < 1 || selectedHouse) {
-      return;
-    }
-
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      fetchHouses(regionId, dsoId, selectedStreet.id, houseQuery).then((result) => {
-        setHouses(result);
-        setIsHouseOpen(true);
-        setIsLoading(false);
-      });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [houseQuery, selectedStreet, regionId, dsoId, selectedHouse]);
-
-  const handleStreetSelect = (street: Street) => {
-    setSelectedStreet(street);
-    setStreetQuery(street.value);
-    setIsStreetOpen(false);
-    setHouseQuery("");
-    setSelectedHouse(null);
-    setHouses([]); // Скидаємо будинки
-    setError(null);
-  };
-
-  // Клік на будинок — одразу визначаємо групу
   const handleHouseSelect = async (house: House) => {
     if (!selectedStreet) return;
 
@@ -142,16 +155,22 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
     setIsLoading(true);
     setError(null);
 
-    const groupInfo = await fetchGroup(regionId, selectedStreet.id, house.id, dsoId);
+    const groupInfo = await fetchGroup(
+      regionId,
+      selectedStreet.id,
+      house.id,
+      dsoId,
+    );
 
     if (groupInfo) {
       const groupKey = `${groupInfo.group}.${groupInfo.subgroup}`;
+      const addressLabel = `${selectedStreet.value}, ${house.value}`;
 
       localStorage.setItem(STORAGE_KEYS.street, JSON.stringify(selectedStreet));
       localStorage.setItem(STORAGE_KEYS.house, JSON.stringify(house));
       localStorage.setItem(STORAGE_KEYS.group, groupKey);
 
-      onGroupFound(groupKey);
+      onGroupFound(groupKey, addressLabel);
     } else {
       setError("Не вдалося визначити чергу для цієї адреси.");
     }
@@ -236,7 +255,6 @@ export const AddressSearch = ({ regionId, dsoId, onGroupFound }: AddressSearchPr
         )}
       </div>
 
-      {/* Кнопка скидання */}
       {selectedHouse && (
         <button className={styles.addressSearch__reset} onClick={handleReset}>
           ✕

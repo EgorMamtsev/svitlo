@@ -18,6 +18,8 @@ const STORAGE_KEYS = {
   region: "powergrid_selected_region",
   mainQueue: "powergrid_selected_main_queue",
   subQueue: "powergrid_selected_sub_queue",
+  viewMode: "powergrid_view_mode",
+  address: "powergrid_address",
 };
 
 export type ViewMode = "chart" | "dial";
@@ -30,7 +32,11 @@ export const HomePage = () => {
   const [isEmergency, setIsEmergency] = useState(false);
   const [emergencyReason, setEmergencyReason] = useState<string | null>(null);
 
-  const [viewMode, setViewMode] = useState<ViewMode>("chart");
+  // Режим відображення — ініціалізуємо з localStorage
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.viewMode);
+    return (saved as ViewMode) || "chart";
+  });
 
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEYS.region),
@@ -41,8 +47,23 @@ export const HomePage = () => {
   const [selectedSubQueue, setSelectedSubQueue] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEYS.subQueue),
   );
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(() =>
+    localStorage.getItem(STORAGE_KEYS.address),
+  );
 
   const isKyiv = selectedRegionId === "yasno-25";
+
+  // Зберігаємо viewMode
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.viewMode, viewMode);
+  }, [viewMode]);
+
+  // Зберігаємо адресу
+  useEffect(() => {
+    if (selectedAddress)
+      localStorage.setItem(STORAGE_KEYS.address, selectedAddress);
+    else localStorage.removeItem(STORAGE_KEYS.address);
+  }, [selectedAddress]);
 
   useEffect(() => {
     if (!selectedRegionId) {
@@ -138,6 +159,7 @@ export const HomePage = () => {
     setSelectedRegionId(regionId);
     setSelectedMainQueue(null);
     setSelectedSubQueue(null);
+    setSelectedAddress(null);
   };
 
   const handleMainQueueChange = (queue: string) => {
@@ -149,19 +171,22 @@ export const HomePage = () => {
     setSelectedSubQueue(subQueue);
   };
 
-  const handleGroupFound = (groupKey: string) => {
+  const handleGroupFound = (groupKey: string, addressLabel: string) => {
     const [mainQueue] = groupKey.split(".");
     setSelectedMainQueue(mainQueue);
     setSelectedSubQueue(groupKey);
+    setSelectedAddress(addressLabel);
   };
 
   const hasQueues = mainQueues.length > 0;
   const getCurrentDayKey = (): string => "1";
 
-  // Визначаємо, чи все вибрано
   const canShowChart = isKyiv
     ? !!selectedSubQueue
     : !!selectedMainQueue && !!selectedSubQueue;
+
+  // Визначаємо, що показувати в центрі циферблата
+  const centerLabel = isKyiv && selectedAddress ? selectedAddress : undefined;
 
   return (
     <div className={styles.home}>
@@ -237,13 +262,12 @@ export const HomePage = () => {
               <ScheduleDial
                 queueKey={selectedSubQueue}
                 schedule={schedule}
-                dayKey={getCurrentDayKey()}
+                centerLabel={centerLabel}
               />
             )}
           </>
         ) : null}
 
-        {/* StatusPanel — ТІЛЬКИ якщо все вибрано */}
         {canShowChart && (
           <StatusPanel
             schedule={schedule}

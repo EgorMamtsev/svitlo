@@ -38,12 +38,12 @@ export interface ScheduleData {
     sch_names: { [queueKey: string]: string };
     time_type: { [status: string]: string };
     day_status: { [day: string]: DayStatus };
+    day_dates: { [day: string]: string }; // ← ДОДАНО
   };
 }
 
 /**
  * Розбиває статус години на два півгодинні статуси.
- * Повертає [перша половина, друга половина].
  */
 export const splitStatus = (status: StatusType): [StatusType, StatusType] => {
   switch (status) {

@@ -11,15 +11,22 @@
 .home__top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end; /* ← ВИРІВНЮВАННЯ ПО НИЖНЬОМУ КРАЮ */
   gap: 24px;
+  flex-wrap: wrap;
+}
+
+.home__addressSearch {
+  display: flex;
+  align-items: flex-end; /* ← ВИРІВНЮВАННЯ ПО НИЖНЬОМУ КРАЮ */
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .home__controls {
   display: flex;
   gap: 24px;
-  align-items: flex-start;
+  align-items: flex-end; /* ← ВИРІВНЮВАННЯ ПО НИЖНЬОМУ КРАЮ */
 }
 
 .home__schedule {
@@ -41,7 +48,6 @@
   text-align: center;
 }
 
-/* Банер аварійних відключень */
 .home__emergencyBanner {
   display: flex;
   align-items: center;
@@ -93,6 +99,12 @@
     gap: 12px;
   }
 
+  .home__addressSearch {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .home__controls {
     flex-direction: column;
     width: 100%;
@@ -103,25 +115,4 @@
     padding: 12px 16px;
     font-size: 13px;
   }
-}
-.home__addressSearch {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.home__regionSelect {
-  display: flex;
-  align-items: center;
-}
-
-.home__regionSelectInput {
-  padding: 8px 16px;
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  cursor: pointer;
 }

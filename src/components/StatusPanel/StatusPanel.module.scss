@@ -1,6 +1,9 @@
 // src/components/StatusPanel/StatusPanel.module.scss
 @import "../../styles/mixins";
 
+/* =========================================
+   БАЗОВІ СТИЛІ (Десктоп 1200px+)
+   ========================================= */
 .statusPanel {
   display: flex;
   align-items: center;
@@ -12,9 +15,9 @@
   gap: 24px;
   flex-wrap: wrap;
   transition: background-color 0.3s ease, border-color 0.3s ease;
+   box-shadow: var(--shadow-card);
 }
 
-/* Ліва частина: Зараз є світло / немає */
 .statusPanel__current {
   display: flex;
   align-items: center;
@@ -61,7 +64,6 @@
   color: var(--text-secondary);
 }
 
-/* Середня частина: Наступне відключення / Світло повернеться */
 .statusPanel__next {
   display: flex;
   align-items: center;
@@ -92,7 +94,6 @@
   color: var(--text-secondary);
 }
 
-/* Права частина: Статистика */
 .statusPanel__stats {
   display: flex;
   align-items: center;
@@ -134,33 +135,73 @@
   color: var(--text-secondary);
 }
 
-/* --- Планшет (640px — 1199px) --- */
+/* =========================================
+   ПЛАНШЕТ (640px — 1199px)
+   ========================================= */
 @include tablet-only {
   .statusPanel {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
+    gap: 20px;
+    padding: 24px;
   }
 
-  .statusPanel__current,
-  .statusPanel__next,
-  .statusPanel__stats {
-    justify-content: flex-start;
-    width: 100%;
+  .statusPanel__current {
+    flex: none;
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .statusPanel__next {
+    flex: none;
+    justify-content: center;
+    text-align: center;
   }
 
   .statusPanel__stats {
-    padding-top: 16px;
+    flex: none;
+    justify-content: center;
+    padding-top: 20px;
     border-top: 1px solid var(--border-color);
-    gap: 32px;
+    gap: 48px;
   }
 }
 
-/* --- Мобільний (< 640px) --- */
+/* =========================================
+   МОБІЛЬНИЙ (< 640px)
+   ========================================= */
 @include mobile-only {
   .statusPanel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
     padding: 16px;
-    gap: 12px;
+  }
+
+  .statusPanel__current {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .statusPanel__next {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .statusPanel__stats {
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    gap: 24px;
   }
 
   .statusPanel__iconWrapper {
@@ -182,10 +223,6 @@
 
   .statusPanel__nextTime {
     font-size: 14px;
-  }
-
-  .statusPanel__stats {
-    gap: 16px;
   }
 
   .statusPanel__statValue {

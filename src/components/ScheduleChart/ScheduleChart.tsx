@@ -2,6 +2,7 @@
 import { useState } from "react";
 import styles from "./ScheduleChart.module.scss";
 import type { ScheduleData } from "../../api/types";
+import { useResponsiveSegments } from "../../hooks/useResponsiveSegments";
 
 const isDark = (status: string): boolean => {
   return status === "no" || status === "first" || status === "second";
@@ -61,7 +62,6 @@ interface ScheduleChartProps {
 
 type DayTab = "today" | "tomorrow";
 
-// Форматуємо дату українською
 const formatDate = (date: Date): string => {
   const months = [
     "січня", "лютого", "березня", "квітня", "травня", "червня",
@@ -70,7 +70,6 @@ const formatDate = (date: Date): string => {
   return `${date.getDate()} ${months[date.getMonth()]}`;
 };
 
-// Отримуємо дату для вкладки
 const getDateForTab = (tab: DayTab): string => {
   const now = new Date();
   const kyivTime = new Date(
@@ -86,6 +85,7 @@ const getDateForTab = (tab: DayTab): string => {
 
 export const ScheduleChart = ({ queueKey, schedule }: ScheduleChartProps) => {
   const [activeTab, setActiveTab] = useState<DayTab>("today");
+  const segmentsPerRow = useResponsiveSegments();
 
   const dayKey = activeTab === "today" ? "1" : "2";
   const dayStatus = schedule.preset.day_status?.[dayKey];
@@ -95,11 +95,12 @@ export const ScheduleChart = ({ queueKey, schedule }: ScheduleChartProps) => {
   const queueData = schedule.preset.data[queueKey]?.[dayKey];
 
   const allHourKeys = Object.keys(schedule.preset.time_zone);
-  const totalSegments = allHourKeys.length;
-  const segmentsPerRow = totalSegments / 2;
 
-  const firstRowHours = allHourKeys.slice(0, segmentsPerRow);
-  const secondRowHours = allHourKeys.slice(segmentsPerRow);
+  // Розбиваємо на ряди по segmentsPerRow
+  const rows: string[][] = [];
+  for (let i = 0; i < allHourKeys.length; i += segmentsPerRow) {
+    rows.push(allHourKeys.slice(i, i + segmentsPerRow));
+  }
 
   const getRowLabels = (hours: string[]) => {
     const labels: { time: string; isHalf: boolean }[] = [];
@@ -108,13 +109,19 @@ export const ScheduleChart = ({ queueKey, schedule }: ScheduleChartProps) => {
       const [_, start, end] = schedule.preset.time_zone[key];
       const startHour = start.split(":")[0];
 
+      // Початок години — для першого сегмента
       if (index === 0) {
         labels.push({ time: start, isHalf: false });
       }
 
+      // Середина години (півгодини) — для кожного сегмента
       labels.push({ time: `${startHour}:30`, isHalf: true });
 
+      // Кінець години — для останнього сегмента
       if (index === hours.length - 1) {
+        labels.push({ time: end, isHalf: false });
+      } else {
+        // Початок наступної години
         labels.push({ time: end, isHalf: false });
       }
     });
@@ -122,58 +129,59 @@ export const ScheduleChart = ({ queueKey, schedule }: ScheduleChartProps) => {
     return labels;
   };
 
-  const firstRowLabels = getRowLabels(firstRowHours);
-  const secondRowLabels = getRowLabels(secondRowHours);
-
   const queueName = schedule.preset.sch_names[queueKey] || queueKey;
 
-  const renderRow = (hours: string[], labels: { time: string; isHalf: boolean }[]) => (
-    <div className={styles.chart__rowWrapper}>
-      <div className={styles.chart__timeLabels}>
-        {labels.map((label, index) => (
-          <span
-            key={index}
-            className={`${styles.chart__timeLabel} ${
-              label.isHalf ? styles.chart__timeLabel_half : ""
-            }`}
-            style={{ left: `${(index / (labels.length - 1)) * 100}%` }}
-          >
-            {label.time}
-          </span>
-        ))}
+  const renderRow = (hours: string[]) => {
+    const labels = getRowLabels(hours);
+
+    return (
+      <div className={styles.chart__rowWrapper}>
+        <div className={styles.chart__timeLabels}>
+          {labels.map((label, index) => (
+            <span
+              key={index}
+              className={`${styles.chart__timeLabel} ${
+                label.isHalf ? styles.chart__timeLabel_half : ""
+              }`}
+              style={{ left: `${(index / (labels.length - 1)) * 100}%` }}
+            >
+              {label.time}
+            </span>
+          ))}
+        </div>
+
+        <div
+          className={styles.chart__row}
+          style={{ gridTemplateColumns: `repeat(${hours.length}, 1fr)` }}
+        >
+          {hours.map((hourKey, index) => {
+            const status = (queueData?.[hourKey] || "no") as string;
+            const prevHourKey = hours[index - 1];
+            const nextHourKey = hours[index + 1];
+            const prevStatus = prevHourKey ? (queueData?.[prevHourKey] as string) : null;
+            const nextStatus = nextHourKey ? (queueData?.[nextHourKey] as string) : null;
+
+            const firstHalfColor = getHalfColor(status, "first", prevStatus, nextStatus);
+            const secondHalfColor = getHalfColor(status, "second", prevStatus, nextStatus);
+            const timeRange = schedule.preset.time_zone[hourKey][0];
+
+            return (
+              <div key={hourKey} className={styles.chart__hourCell}>
+                <div
+                  className={`${styles.chart__halfCell} ${colorToClass(firstHalfColor)}`}
+                  title={`${timeRange} (перші 30 хв) — ${schedule.preset.time_type[status] || status}`}
+                ></div>
+                <div
+                  className={`${styles.chart__halfCell} ${colorToClass(secondHalfColor)}`}
+                  title={`${timeRange} (другі 30 хв) — ${schedule.preset.time_type[status] || status}`}
+                ></div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-      <div
-        className={styles.chart__row}
-        style={{ gridTemplateColumns: `repeat(${hours.length}, 1fr)` }}
-      >
-        {hours.map((hourKey, index) => {
-          const status = (queueData?.[hourKey] || "no") as string;
-          const prevHourKey = hours[index - 1];
-          const nextHourKey = hours[index + 1];
-          const prevStatus = prevHourKey ? (queueData?.[prevHourKey] as string) : null;
-          const nextStatus = nextHourKey ? (queueData?.[nextHourKey] as string) : null;
-
-          const firstHalfColor = getHalfColor(status, "first", prevStatus, nextStatus);
-          const secondHalfColor = getHalfColor(status, "second", prevStatus, nextStatus);
-          const timeRange = schedule.preset.time_zone[hourKey][0];
-
-          return (
-            <div key={hourKey} className={styles.chart__hourCell}>
-              <div
-                className={`${styles.chart__halfCell} ${colorToClass(firstHalfColor)}`}
-                title={`${timeRange} (перші 30 хв) — ${schedule.preset.time_type[status] || status}`}
-              ></div>
-              <div
-                className={`${styles.chart__halfCell} ${colorToClass(secondHalfColor)}`}
-                title={`${timeRange} (другі 30 хв) — ${schedule.preset.time_type[status] || status}`}
-              ></div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className={styles.chart}>
@@ -215,8 +223,9 @@ export const ScheduleChart = ({ queueKey, schedule }: ScheduleChartProps) => {
         </div>
       ) : (
         <div className={styles.chart__grid}>
-          {renderRow(firstRowHours, firstRowLabels)}
-          {renderRow(secondRowHours, secondRowLabels)}
+          {rows.map((hours, index) => (
+            <div key={index}>{renderRow(hours)}</div>
+          ))}
         </div>
       )}
 

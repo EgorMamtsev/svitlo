@@ -10,76 +10,95 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: var(--shadow-card);
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
 }
 
-.dial__title {
+.dial__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.dial__dateWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dial__date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 24px 0;
-  text-align: center;
+}
+
+.dial__icon {
+  font-size: 18px;
+}
+
+.dial__updated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-left: 26px;
+}
+
+.dial__updatedDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--dot-green);
+}
+
+.dial__tabs {
+  display: flex;
+  gap: 4px;
+  background-color: var(--bg-input);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.dial__tab {
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &_active {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow);
+  }
 }
 
 .dial__svg {
   max-width: 100%;
   height: auto;
-}
 
-.dial__segment {
-  stroke: var(--bg-card);
-  stroke-width: 2;
-  transition: opacity 0.2s;
-  opacity: 0.5;
-}
-
-.dial__segmentInner {
-  stroke: var(--bg-card);
-  stroke-width: 1;
-  transition: opacity 0.2s;
-  opacity: 1;
-}
-
-.dial__segment_on {
-  fill: var(--cell-green);
-}
-
-.dial__segment_off {
-  fill: var(--cell-red);
-}
-
-.dial__hourLabel {
-  font-size: 14px;
-  font-weight: 600;
-  fill: var(--text-primary);
-  pointer-events: none;
-}
-
-.dial__centerText {
-  font-size: 22px;
-  font-weight: 800;
-  fill: var(--text-primary);
-}
-
-.dial__centerSubtext {
-  font-size: 14px;
-  font-weight: 600;
-  fill: var(--text-secondary);
-}
-
-.dial__centerStats {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.dial__statsOff {
-  fill: var(--cell-red);
-}
-
-.dial__statsOn {
-  fill: var(--cell-green);
+  path {
+    stroke: var(--dial-stroke);
+    stroke-width: 1;
+  }
 }
 
 .dial__placeholder {
@@ -93,12 +112,61 @@
   min-height: 120px;
 }
 
+.dial__legend {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
+}
+
+.dial__legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dial__legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+
+  &_green {
+    background-color: #a4edc4;
+  }
+
+  &_red {
+    background-color: #cc6f6f;
+  }
+}
+
 @include mobile-only {
   .dial {
     padding: 16px;
   }
 
-  .dial__title {
+  .dial__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dial__date {
     font-size: 14px;
+  }
+
+  .dial__tabs {
+    width: 100%;
+  }
+
+  .dial__tab {
+    flex: 1;
+    text-align: center;
   }
 }

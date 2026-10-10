@@ -1,4 +1,4 @@
-// src/api/oeAdapter.ts
+// src/api/oe/oeAdapter.ts
 import type { ScheduleData, StatusType, DayStatus } from '../types';
 import type { OEData } from './oeApi';
 
@@ -7,6 +7,14 @@ export interface AdaptedOESchedule {
   isEmergency: boolean;
   emergencyReason: string | null;
 }
+
+const formatDate = (date: Date): string => {
+  const months = [
+    "січня", "лютого", "березня", "квітня", "травня", "червня",
+    "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
+  ];
+  return `${date.getDate()} ${months[date.getMonth()]}`;
+};
 
 export const adaptOEData = (
   oeData: OEData,
@@ -17,8 +25,28 @@ export const adaptOEData = (
 
   const todayIndex = timestamps.indexOf(todayTimestamp);
   const todayData = oeData.fact.data[todayTimestamp];
-  const tomorrowTimestamp = timestamps[todayIndex + 1] || timestamps[0];
-  const tomorrowData = oeData.fact.data[tomorrowTimestamp];
+  const tomorrowTimestamp = timestamps[todayIndex + 1];
+  const tomorrowData = tomorrowTimestamp
+    ? oeData.fact.data[tomorrowTimestamp]
+    : null;
+
+  const hasTomorrowData =
+    !!tomorrowData && Object.keys(tomorrowData).length > 0;
+
+  // Перевіряємо, чи fact.today = реальна дата
+  const kyivNow = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Europe/Kyiv" })
+  );
+  const todayDate = new Date(Number(todayTimestamp) * 1000);
+
+  const isTodayActual =
+    todayDate.toDateString() === kyivNow.toDateString();
+
+  // Якщо fact.today = майбутнє, зсуваємо назви днів
+  const days: Record<string, string> = {
+    '1': isTodayActual ? 'Сьогодні' : 'Завтра',
+    '2': isTodayActual ? 'Завтра' : 'Післязавтра',
+  };
 
   const data: Record<string, Record<string, Record<string, StatusType>>> = {};
   const schNames: Record<string, string> = {};
@@ -27,21 +55,24 @@ export const adaptOEData = (
     schNames[queueKey] = `Черга ${queueKey}`;
     data[queueKey] = {
       '1': todayData[queueKey] as Record<string, StatusType>,
-      '2': (tomorrowData?.[queueKey] as Record<string, StatusType>) || (todayData[queueKey] as Record<string, StatusType>),
+      '2': hasTomorrowData
+        ? (tomorrowData![queueKey] as Record<string, StatusType>)
+        : (todayData[queueKey] as Record<string, StatusType>),
     };
   });
 
-  const days: Record<string, string> = {
-    '1': 'Сьогодні',
-    '2': 'Завтра',
-  };
-
   const dayStatus: Record<string, DayStatus> = {
     '1': 'PlannedOutages',
-    '2': 'PlannedOutages',
+    '2': hasTomorrowData ? 'PlannedOutages' : 'WaitingForSchedule',
   };
 
-  // Для OE-областей ми не маємо інформації про аварійні відключення
+  const dayDates: Record<string, string> = {
+    '1': formatDate(todayDate),
+    '2': hasTomorrowData
+      ? formatDate(new Date(Number(tomorrowTimestamp!) * 1000))
+      : formatDate(new Date(todayDate.getTime() + 86400000)),
+  };
+
   const isEmergency = false;
   const emergencyReason = null;
 
@@ -60,6 +91,7 @@ export const adaptOEData = (
         sch_names: schNames,
         time_type: oeData.preset.time_type,
         day_status: dayStatus,
+        day_dates: dayDates,
       },
     },
     isEmergency,
