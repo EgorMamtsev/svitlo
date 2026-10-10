@@ -14,6 +14,7 @@
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+/* Ліва частина: Зараз є світло / немає */
 .statusPanel__current {
   display: flex;
   align-items: center;
@@ -31,6 +32,11 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background-color 0.3s ease;
+
+  &_off {
+    background-color: rgba(244, 67, 54, 0.15);
+  }
 }
 
 .statusPanel__icon {
@@ -55,52 +61,13 @@
   color: var(--text-secondary);
 }
 
-.statusPanel__legend {
-  display: flex;
-  gap: 24px;
-  flex: 1;
-  justify-content: center;
-  min-width: 200px;
-}
-
-.statusPanel__legendItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.statusPanel__dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-
-  &_green {
-    background-color: var(--cell-green);
-  }
-
-  &_red {
-    background-color: var(--cell-red);
-  }
-}
-
-.statusPanel__legendTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.statusPanel__legendSubtitle {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
+/* Середня частина: Наступне відключення / Світло повернеться */
 .statusPanel__next {
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 1;
-  justify-content: flex-end;
+  justify-content: center;
   min-width: 200px;
 }
 
@@ -125,22 +92,71 @@
   color: var(--text-secondary);
 }
 
-@include tablet-only {
-  .statusPanel {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+/* Права частина: Статистика */
+.statusPanel__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 200px;
+}
+
+.statusPanel__stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statusPanel__statDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &_on {
+    background-color: var(--cell-green);
   }
 
-  .statusPanel__legend {
-    justify-content: flex-start;
-  }
-
-  .statusPanel__next {
-    justify-content: flex-start;
+  &_off {
+    background-color: var(--cell-red);
   }
 }
 
+.statusPanel__statValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statusPanel__statLabel {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* --- Планшет (640px — 1199px) --- */
+@include tablet-only {
+  .statusPanel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .statusPanel__current,
+  .statusPanel__next,
+  .statusPanel__stats {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .statusPanel__stats {
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    gap: 32px;
+  }
+}
+
+/* --- Мобільний (< 640px) --- */
 @include mobile-only {
   .statusPanel {
     padding: 16px;
@@ -164,11 +180,15 @@
     font-size: 12px;
   }
 
-  .statusPanel__legend {
+  .statusPanel__nextTime {
+    font-size: 14px;
+  }
+
+  .statusPanel__stats {
     gap: 16px;
   }
 
-  .statusPanel__nextTime {
+  .statusPanel__statValue {
     font-size: 14px;
   }
 }

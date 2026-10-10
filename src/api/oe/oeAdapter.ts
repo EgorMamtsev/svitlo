@@ -1,5 +1,5 @@
 // src/api/oeAdapter.ts
-import type { ScheduleData, StatusType, DayStatus } from './types';
+import type { ScheduleData, StatusType, DayStatus } from '../types';
 import type { OEData } from './oeApi';
 
 export interface AdaptedOESchedule {

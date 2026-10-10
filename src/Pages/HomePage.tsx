@@ -7,9 +7,9 @@ import { ScheduleChart } from "../components/ScheduleChart/ScheduleChart";
 import { ScheduleDial } from "../components/ScheduleDial/ScheduleDial";
 import { StatusPanel } from "../components/StatusPanel/StatusPanel";
 import { fetchPlannedOutages } from "../api/yasno/yasnoApi";
-import { fetchOEData } from "../api/oeApi";
+import { fetchOEData } from "../api/oe/oeApi";
 import { adaptYasnoData } from "../api/yasno/yasnoAdapter";
-import { adaptOEData } from "../api/oeAdapter";
+import { adaptOEData } from "../api/oe/oeAdapter";
 import { REGIONS } from "../api/regions";
 import type { ScheduleData } from "../api/types";
 import styles from "../styles/HomePage.module.scss";
@@ -42,9 +42,7 @@ export const HomePage = () => {
     localStorage.getItem(STORAGE_KEYS.subQueue),
   );
 
-  // Визначаємо, чи це Київ
   const isKyiv = selectedRegionId === "yasno-25";
-  console.log("isKyiv:", isKyiv, "selectedRegionId:", selectedRegionId);
 
   useEffect(() => {
     if (!selectedRegionId) {
@@ -151,10 +149,8 @@ export const HomePage = () => {
     setSelectedSubQueue(subQueue);
   };
 
-  // Обробник для Києва: коли знайдено групу
   const handleGroupFound = (groupKey: string) => {
-    console.log("handleGroupFound:", groupKey);
-    const [mainQueue, subQueue] = groupKey.split(".");
+    const [mainQueue] = groupKey.split(".");
     setSelectedMainQueue(mainQueue);
     setSelectedSubQueue(groupKey);
   };
@@ -162,7 +158,7 @@ export const HomePage = () => {
   const hasQueues = mainQueues.length > 0;
   const getCurrentDayKey = (): string => "1";
 
-  // Визначаємо, чи можна показувати графік
+  // Визначаємо, чи все вибрано
   const canShowChart = isKyiv
     ? !!selectedSubQueue
     : !!selectedMainQueue && !!selectedSubQueue;
@@ -170,22 +166,20 @@ export const HomePage = () => {
   return (
     <div className={styles.home}>
       <div className={styles.home__top}>
-        {/* Для Києва — пошук за адресою */}
         {isKyiv ? (
           <div className={styles.home__addressSearch}>
-            <div className={styles.home__regionSelect}>
-              <select
-                value={selectedRegionId || ""}
-                onChange={(e) => handleRegionChange(e.target.value)}
-                className={styles.home__regionSelectInput}
-              >
-                {REGIONS.map((region) => (
-                  <option key={region.id} value={region.id}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <RegionSelector
+              regions={REGIONS}
+              selectedRegionId={selectedRegionId}
+              mainQueues={mainQueues}
+              subQueues={subQueues}
+              selectedMainQueue={selectedMainQueue}
+              selectedSubQueue={selectedSubQueue}
+              onRegionChange={handleRegionChange}
+              onMainQueueChange={handleMainQueueChange}
+              onSubQueueChange={handleSubQueueChange}
+              hideQueues={true}
+            />
             <AddressSearch
               regionId={25}
               dsoId={902}
@@ -249,7 +243,14 @@ export const HomePage = () => {
           </>
         ) : null}
 
-        <StatusPanel />
+        {/* StatusPanel — ТІЛЬКИ якщо все вибрано */}
+        {canShowChart && (
+          <StatusPanel
+            schedule={schedule}
+            queueKey={selectedSubQueue}
+            dayKey={getCurrentDayKey()}
+          />
+        )}
       </div>
     </div>
   );
