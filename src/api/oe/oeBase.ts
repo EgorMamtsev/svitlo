@@ -1,4 +1,4 @@
-// src/api/oe/oeAdapter.ts
+// src/api/oe/oeBase.ts
 import type { ScheduleData, StatusType, DayStatus } from '../types';
 import type { OEData } from './oeApi';
 
@@ -8,7 +8,7 @@ export interface AdaptedOESchedule {
   emergencyReason: string | null;
 }
 
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
   const months = [
     "січня", "лютого", "березня", "квітня", "травня", "червня",
     "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"
@@ -16,7 +16,11 @@ const formatDate = (date: Date): string => {
   return `${date.getDate()} ${months[date.getMonth()]}`;
 };
 
-export const adaptOEData = (
+/**
+ * Базова функція для адаптації OE-даних.
+ * Кожна область може перевизначити її, якщо формат зміниться.
+ */
+export const adaptOEBase = (
   oeData: OEData,
   regionName: string
 ): AdaptedOESchedule => {
@@ -33,7 +37,7 @@ export const adaptOEData = (
   const hasTomorrowData =
     !!tomorrowData && Object.keys(tomorrowData).length > 0;
 
-  // Перевіряємо, чи fact.today = реальна дата
+  // Перевіряємо, чи fact.today = реальна київська дата
   const kyivNow = new Date(
     new Date().toLocaleString("en-US", { timeZone: "Europe/Kyiv" })
   );
@@ -42,7 +46,6 @@ export const adaptOEData = (
   const isTodayActual =
     todayDate.toDateString() === kyivNow.toDateString();
 
-  // Якщо fact.today = майбутнє, зсуваємо назви днів
   const days: Record<string, string> = {
     '1': isTodayActual ? 'Сьогодні' : 'Завтра',
     '2': isTodayActual ? 'Завтра' : 'Післязавтра',
@@ -73,9 +76,6 @@ export const adaptOEData = (
       : formatDate(new Date(todayDate.getTime() + 86400000)),
   };
 
-  const isEmergency = false;
-  const emergencyReason = null;
-
   return {
     schedule: {
       regionId: oeData.regionId,
@@ -94,7 +94,7 @@ export const adaptOEData = (
         day_dates: dayDates,
       },
     },
-    isEmergency,
-    emergencyReason,
+    isEmergency: false,
+    emergencyReason: null,
   };
 };

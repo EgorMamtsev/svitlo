@@ -9,7 +9,7 @@ import { StatusPanel } from "../components/StatusPanel/StatusPanel";
 import { fetchPlannedOutages } from "../api/yasno/yasnoApi";
 import { fetchOEData } from "../api/oe/oeApi";
 import { adaptYasnoData } from "../api/yasno/yasnoAdapter";
-import { adaptOEData } from "../api/oe/oeAdapter";
+import { adaptOEByKey } from "../api/oe/oeFactory";
 import { REGIONS } from "../api/regions";
 import type { ScheduleData } from "../api/types";
 import styles from "../styles/HomePage.module.scss";
@@ -32,7 +32,6 @@ export const HomePage = () => {
   const [isEmergency, setIsEmergency] = useState(false);
   const [emergencyReason, setEmergencyReason] = useState<string | null>(null);
 
-  // Режим відображення — ініціалізуємо з localStorage
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.viewMode);
     return (saved as ViewMode) || "chart";
@@ -53,12 +52,10 @@ export const HomePage = () => {
 
   const isKyiv = selectedRegionId === "yasno-25";
 
-  // Зберігаємо viewMode
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.viewMode, viewMode);
   }, [viewMode]);
 
-  // Зберігаємо адресу
   useEffect(() => {
     if (selectedAddress)
       localStorage.setItem(STORAGE_KEYS.address, selectedAddress);
@@ -100,7 +97,11 @@ export const HomePage = () => {
     } else if (region.source === "oe" && region.fileName) {
       fetchOEData(region.fileName).then((data) => {
         if (data) {
-          const adapted = adaptOEData(data, region.name);
+          const adapted = adaptOEByKey(
+            region.adapterKey || "poltava",
+            data,
+            region.name,
+          );
           setSchedule(adapted.schedule);
           setIsEmergency(adapted.isEmergency);
           setEmergencyReason(adapted.emergencyReason);
@@ -172,7 +173,7 @@ export const HomePage = () => {
   };
 
   const handleGroupFound = (groupKey: string, addressLabel: string) => {
-    const [mainQueue] = groupKey.split(".");
+    const [mainQueue, subQueue] = groupKey.split(".");
     setSelectedMainQueue(mainQueue);
     setSelectedSubQueue(groupKey);
     setSelectedAddress(addressLabel);
@@ -185,7 +186,6 @@ export const HomePage = () => {
     ? !!selectedSubQueue
     : !!selectedMainQueue && !!selectedSubQueue;
 
-  // Визначаємо, що показувати в центрі циферблата
   const centerLabel = isKyiv && selectedAddress ? selectedAddress : undefined;
 
   return (
