@@ -8,37 +8,56 @@
 }
 
 .regionSelector__select {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #f5f6f7;
-  border: 1px solid #e2e6e9;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #313237;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: border-color 0.2s;
-  white-space: nowrap;
+  transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
 
-  &:hover {
-    border-color: #b0b5b9;
+  &:hover:not(.regionSelector__select_disabled) {
+    border-color: var(--border-hover);
+  }
+
+  &_disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.regionSelector__nativeSelect {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  padding-right: 16px;
+
+  &:disabled {
+    cursor: not-allowed;
   }
 }
 
 .regionSelector__icon {
   font-size: 16px;
-  color: #89939a;
+  color: var(--text-secondary);
 }
 
 .regionSelector__arrow {
   font-size: 10px;
-  color: #89939a;
-  margin-left: 4px;
+  color: var(--text-secondary);
+  pointer-events: none;
 }
 
-/* --- Мобільний (< 640px) --- */
 @include mobile-only {
   .regionSelector {
     width: 100%;
@@ -50,5 +69,10 @@
     width: 100%;
     justify-content: center;
     padding: 10px 16px;
+  }
+
+  .regionSelector__nativeSelect {
+    width: 100%;
+    text-align: center;
   }
 }

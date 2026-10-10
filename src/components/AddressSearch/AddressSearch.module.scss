@@ -1,0 +1,151 @@
+// src/components/AddressSearch/AddressSearch.module.scss
+@import "../../styles/mixins";
+
+.addressSearch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.addressSearch__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  min-width: 280px;
+
+  &:hover {
+    border-color: var(--border-hover);
+  }
+
+  &:focus-within {
+    border-color: var(--accent);
+  }
+}
+
+.addressSearch__icon {
+  font-size: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.addressSearch__input {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: text;
+  outline: none;
+  width: 100%;
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.addressSearch__searchButton {
+  padding: 8px 20px;
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.addressSearch__reset {
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 14px;
+
+  &:hover {
+    color: var(--cell-red);
+    border-color: var(--cell-red);
+  }
+}
+
+.addressSearch__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 4px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.addressSearch__dropdownItem {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: var(--text-primary);
+  font-size: 14px;
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.addressSearch__status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.addressSearch__error {
+  font-size: 12px;
+  color: var(--cell-red);
+}
+
+@include mobile-only {
+  .addressSearch {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .addressSearch__field {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .addressSearch__searchButton {
+    width: 100%;
+  }
+}

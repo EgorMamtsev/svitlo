@@ -10,15 +10,16 @@
 .viewSwitcher__label {
   font-size: 14px;
   font-weight: 700;
-  color: #313237;
+  color: var(--text-primary);
 }
 
 .viewSwitcher__buttons {
   display: flex;
   gap: 8px;
-  background-color: #f5f6f7;
+  background-color: var(--bg-input);
   padding: 4px;
   border-radius: 8px;
+  transition: background-color 0.3s ease;
 }
 
 .viewSwitcher__button {
@@ -31,18 +32,18 @@
   border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
-  color: #89939a;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    color: #313237;
+    color: var(--text-primary);
   }
 
   &_active {
-    background-color: #fff;
-    color: #313237;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow);
   }
 }
 
@@ -50,7 +51,6 @@
   font-size: 16px;
 }
 
-/* --- Мобільний (< 640px) --- */
 @include mobile-only {
   .viewSwitcher {
     width: 100%;

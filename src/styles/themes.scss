@@ -1,0 +1,53 @@
+// src/styles/themes.scss
+
+:root {
+  // Світла тема (за замовчуванням)
+  --bg-body: #f5f6f7;
+  --bg-card: #ffffff;
+  --bg-input: #f5f6f7;
+  --bg-hover: #f0f1f2;
+  
+  --text-primary: #313237;
+  --text-secondary: #89939a;
+  --text-muted: #b0b5b9;
+  
+  --border-color: #e2e6e9;
+  --border-hover: #b0b5b9;
+  
+  --accent: #476df4;
+  --accent-hover: #3a5ce0;
+  --accent-shadow: rgba(71, 109, 244, 0.3);
+  
+  --cell-green: #a8e6a3;
+  --cell-red: #f4a2a2;
+  --dot-green: #4caf50;
+  
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+  // Темна тема
+  --bg-body: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-input: #252836;
+  --bg-hover: #2e3140;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --border-color: #2e303a;
+  --border-hover: #4b4f5c;
+  
+  --accent: #5b7cfa;
+  --accent-hover: #476df4;
+  --accent-shadow: rgba(91, 124, 250, 0.4);
+  
+  --cell-green: #2e7d32;
+  --cell-red: #c62828;
+  --dot-green: #4caf50;
+  
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+}

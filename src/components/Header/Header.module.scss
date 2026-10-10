@@ -3,11 +3,14 @@
 
 .header {
   width: 100%;
-  background-color: #fff;
-  border-bottom: 1px solid #e2e6e9;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .header__container {
@@ -30,19 +33,19 @@
 
 .header__logoIcon {
   font-size: 24px;
-  color: #476df4;
+  color: var(--accent);
 }
 
 .header__logoText {
   font-size: 20px;
   font-weight: 800;
-  color: #313237;
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
 .header__description {
   font-size: 13px;
-  color: #89939a;
+  color: var(--text-secondary);
   margin: 0;
   flex: 1;
   text-align: center;
@@ -56,7 +59,6 @@
   flex-shrink: 0;
 }
 
-/* --- Планшет (640px — 1199px) --- */
 @include tablet-only {
   .header__container {
     padding: 0 16px;
@@ -69,7 +71,6 @@
   }
 }
 
-/* --- Мобільний (< 640px) --- */
 @include mobile-only {
   .header__container {
     height: 56px;
@@ -90,7 +91,6 @@
   }
 }
 
-/* --- Дуже маленькі (< 400px) --- */
 @media (max-width: 399px) {
   .header__container {
     padding: 0 8px;

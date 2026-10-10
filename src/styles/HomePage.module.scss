@@ -28,6 +28,43 @@
   gap: 24px;
 }
 
+.home__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Банер аварійних відключень */
+.home__emergencyBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: rgba(244, 208, 63, 0.15);
+  border: 1px solid #f4d03f;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #f4d03f;
+}
+
+.home__emergencyIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .home__emergencyBanner {
+  background-color: rgba(244, 208, 63, 0.1);
+  color: #f4d03f;
+}
+
 /* --- Планшет (640px — 1199px) --- */
 @include tablet-only {
   .home {
@@ -61,4 +98,30 @@
     width: 100%;
     gap: 12px;
   }
+
+  .home__emergencyBanner {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+}
+.home__addressSearch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home__regionSelect {
+  display: flex;
+  align-items: center;
+}
+
+.home__regionSelectInput {
+  padding: 8px 16px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
 }
